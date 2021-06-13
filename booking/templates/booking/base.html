@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'booking/format.css' %}">
+    <title>BOOKING: {% block title %}{% endblock %}</title>
+</head>
+<body>
+   <div>
+       <a href="http://">All rooms</a>
+       <a href="">Create a new room</a>
+    {% block content %}{% endblock %}
+    <footer>
+        <p>Author: Ja sam to zrobilem</p>
+        <p><a href="mailto:lk@roomservice.org">Contact me</a></p>
+    </footer>
+   </div>
+</body>
+</html>

@@ -4,14 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'booking/format.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'booking/format.css' %}"> -->
     <title>BOOKING: {% block title %}{% endblock %}</title>
 </head>
 <body>
-   <div>
-       <a href="http://">All rooms</a>
-       <a href="">Create a new room</a>
+    {% if messages %}
+        <ul class="messages"
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div>
+        <h2>Booking: {% block view_title %}{% endblock %}</h2>
+    </div>
+    <div>
+        <ul>
+            <li><a href="http://127.0.0.1:8000/room/home">Home</a></li>
+            <li><a href="http://">All rooms</a></li>
+            <li><a href="http://127.0.0.1:8000/room/new/">Create a new room</a></li>
+            <li style="float:right"><a class="active"
+                                       href="http://about">About</a></li>
+        </ul>
+    </div>
+    <div>
     {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
     <footer>
         <p>Author: Ja sam to zrobilem</p>
         <p><a href="mailto:lk@roomservice.org">Contact me</a></p>

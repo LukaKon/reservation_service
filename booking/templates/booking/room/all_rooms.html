@@ -1,0 +1,45 @@
+{% extends "booking/base.html" %}
+{% block title %}List of all rooms{% endblock %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Capacity</th>
+            <th>Availability</th>   <!-- TODO: range of dates / yes or no? -->
+            <th>Projector</th>
+            <th>Edit room</th>
+            <th>Delete room</th>
+            <th>Reservation</th>
+        </tr>
+        {% for room in rooms %}
+        <tr>
+            <td><a href="http://127.0.0.1:8000/room/room-details/{{ room.id }}">{{ room.name }}</a></td>
+            <td>{{ room.capacity }}</td>
+            <td>yes / not</td>
+            <td>
+                {% if room.projector_availability %} YES
+                {% else %} NO
+                {% endif %}
+            </td>
+            <td>
+                <a href="http://127.0.0.1:8080/room/edit-room/{{ room.id }}">
+                    <button class="button">edit</button>
+                </a>
+            </td>
+            <td>
+                <a href="http://127.0.0.1:8080/room/delete-room/{{ room.id }}">
+                    <button class="button">delete</button>
+                </a>
+            </td>
+            <td>
+                <a href="http://127.0.0.1:8080/room/reserve-room/{{ room.id }}">
+                    <button class="button">reserve</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</form>
+{% endblock %}

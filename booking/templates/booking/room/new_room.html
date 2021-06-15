@@ -4,29 +4,27 @@
 <form method="post">
     {% csrf_token %}
 
-    <!-- {% block view_title %}Create a new room{% endblock %} -->
-
     <p>
-        <label>Name of room:
-            <input type="text" name="name">
-            {% if name_error %}
-                {{ name_error }}
-            {% endif %}
-        </label>
+    <label>Name of room:
+        <input type="text" name="name">
+        {% if name_error %}
+        {{ name_error }}
+        {% endif %}
+    </label>
     </p>
     <p>
-        <label>Room capacity:
-            <input type="number" name="capacity">
-            {% if capacity_error %}
-                {{ capacity_error }}
-            {% endif %}
-        </label>
+    <label>Room capacity:
+        <input type="number" name="capacity">
+        {% if capacity_error %}
+        {{ capacity_error }}
+        {% endif %}
+    </label>
     </p>
     <p>
-        <label>Projector availability:
-            <input type="checkbox" name="projector_availability">
-        </label>
+    <label>Projector availability:
+        <input type="checkbox" name="projector_availability">
+    </label>
     </p>
-    <input type="submit">
+    <input type="submit" value="Save">
 </form>
 {% endblock %}

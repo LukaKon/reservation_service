@@ -1,4 +1,5 @@
 from django.db import models
+# from django.db.models.deletion import CASCADE
 
 
 # Create your models here.
@@ -11,5 +12,13 @@ class Room(models.Model):
         return f'{self.name}: {self.capacity}, {self.projector_availability}'
 
 
-class N(models.Model):
-    pass
+class Reservation(models.Model):
+    date = models.DateField()
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    comment = models.TextField()
+
+    class Meta:
+        unique_together = ('date', 'room_id',)
+
+    def __str__(self):
+        return f'{self.date}: {self.room_id}, {self.comment}'

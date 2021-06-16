@@ -5,25 +5,25 @@
     {% csrf_token %}
 
     <p>
-    <label>Name of room:
-        <input type="text" name="name">
-        {% if name_error %}
-        {{ name_error }}
-        {% endif %}
-    </label>
+    <label for="name">Name of room:</label>
+    <input type="text" id="name" name="name" value="{{ room.name }}">
+    {% if name_error %}
+    {{ name_error }}
+    {% endif %}
     </p>
+
     <p>
-    <label>Room capacity:
-        <input type="number" name="capacity">
-        {% if capacity_error %}
-        {{ capacity_error }}
-        {% endif %}
-    </label>
+    <label for="capacity">Capacity of room:</label>
+    <input type="number" id="capacity" name="capacity" value="{{ room.capacity }}">
+    {% if capacity_error %}
+    {{ capacity_error }}
+    {% endif %}
     </p>
+
     <p>
-    <label>Projector availability:
-        <input type="checkbox" name="projector_availability">
-    </label>
+    <label for="projector_availability">Projector availability:</label>
+    <input type="checkbox" name="projector_availability" value= checked>
+    <!-- TODO - how to set checbox according to database data -->
     </p>
     <input type="submit" value="Save">
 </form>

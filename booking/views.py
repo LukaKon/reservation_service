@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect, HttpResponse
-from booking.models import Room
+from django.shortcuts import render, redirect
+from booking.models import Room, Reservation
 from django.views import View
 from django.contrib import messages
 from django.db.utils import IntegrityError
+import datetime
 from . import models
 # Create your views here.
 
@@ -45,7 +46,7 @@ class NewRoom(View):
                           self.HTML_TEMPLATE,
                           context={'name_error': 'Name alredy exist.'})
 
-        if isinstance(capacity, int):
+        if capacity.isdigit():
             capacity = int(capacity)
         else:
             return render(
@@ -75,7 +76,10 @@ class AllRooms(View):
                       context={'rooms': rooms})
 
     def post(self, request):
-        pass
+        rooms = Room.objects.all().order_by('name')
+        return render(request,
+                      self.HTML_TEMPLATE,
+                      context={'rooms': rooms})
 
 
 class RoomDetails(View):
@@ -87,10 +91,91 @@ class RoomDetails(View):
                       self.HTML_TEMPLATE,
                       context={'room': room})
 
+    def post(self, request, room_id):
+        room = Room.objects.get(pk=room_id)
+        return render(request,
+                      self.HTML_TEMPLATE,
+                      context={'room': room})
+
 
 class EditRoom(View):
-    HTML_TEMPLATE = 'booking/room/edit_room.html'
-    HTML_REDIRECT = 'booking/room/all_rooms.html'
+    HTML_TEMPLATE = 'booking/room/new_room.html'
+
+    def get(self, request, room_id):
+        room = Room.objects.get(pk=room_id)
+        return render(request,
+                      self.HTML_TEMPLATE,
+                      # 'booking/room/new_room.html',
+                      context={'room': room})
+
+    def post(self, request, room_id):
+
+        current_room = Room.objects.get(pk=room_id).name
+        room_list = [room.name for room in Room.objects.all()]
+
+        name = request.POST.get('name')
+        capacity = request.POST.get('capacity')
+        projector_availability = request.POST.get(
+            'projector_availability') == 'on'
+
+        if name == '':
+            return render(request,
+                          self.HTML_TEMPLATE,
+                          context={'name_error': 'Name is required.', 'room': current_room})
+
+        room_list.remove(current_room)
+        if name in room_list:
+            return render(request,
+                          self.HTML_TEMPLATE,
+                          context={'name_error': 'Name alredy exist.', 'room': current_room})
+
+        if capacity.isdigit():
+            capacity = int(capacity)
+        else:
+            return render(
+                request,
+                self.HTML_TEMPLATE,
+                context={'capacity_error': 'Inserted value is not integer', 'room': current_room})
+
+        if capacity not in range(2, 400):
+            return render(request,
+                          self.HTML_TEMPLATE,
+                          context={'capacity_error': f'(2-400): {capacity}', 'room': current_room})
+
+        room = Room.objects.get(pk=room_id)
+        room.name = name
+        room.capacity = capacity
+        room.projector_availability = projector_availability
+        room.save()
+
+        messages.success(request, 'Room data have been updated')
+        return redirect('AllRooms')
+        # return render(request,
+        #               self.HTML_TEMPLATE,
+        #               context={'room': room})
+
+
+class DeleteRoom(View):
+
+    def get(self, request, room_id):
+        room = Room.objects.get(pk=room_id)
+        print(f'DeleteRoom {room}')
+        room.delete()
+
+        messages.success(request, f'Room {room.name} has been deleted.')
+        return redirect('AllRooms')
+
+    def post(self, request, room_id):
+        room = Room.objects.get(pk=room_id)
+        print(f'DeleteRoom {room}')
+        room.delete()
+
+        messages.success(request, f'Room {room.name} has been deleted.')
+        return redirect('AllRooms')
+
+
+class ReserveRoom(View):
+    HTML_TEMPLATE = 'booking/room/reserve.html'
 
     def get(self, request, room_id):
         room = Room.objects.get(pk=room_id)
@@ -99,29 +184,29 @@ class EditRoom(View):
                       context={'room': room})
 
     def post(self, request, room_id):
+        date = request.POST.get('date')
+        comment = request.POST.get('comment')
 
-        name = request.POST.get('name')
-        capacity = request.POST.get('capacity')
-        projector_availability = request.POST.get(
-            'projector_availability') == 'on'
+        # print(date, type(date))
+
+        conv_date = datetime.datetime.strptime(date, '%Y-%m-%d')
 
         room = Room.objects.get(pk=room_id)
 
-        room.name = name
-        room.capacity = capacity
-        room.projector_availability = projector_availability
-        room.save()
+        if conv_date == room.id:
+            return render(request,
+                          self.HTML_TEMPLATE,
+                          context={'date_error': 'Room already reserved.'})
 
-        messages.success(request, 'Room data have been updated')
-        return redirect(self.HTML_REDIRECT)
+        if conv_date < datetime.datetime.now():
+            return render(request,
+                          self.HTML_TEMPLATE,
+                          context={'date_error': 'Are you time traveler?'})
 
+        Reservation.objects.create(date=date,
+                                   room_id=Room.objects.get(pk=room_id),
+                                   comment=comment,)
 
-class DeleteRoom(View):
-    HTML_REDIRECT = 'booking/room/all_rooms.html'
-
-    def post(self, request, room_id):
-        room = Room.objects.get(pk=room_id)
-        room.delete()
-
-        messages.success(request, f'Room {room.name} has been deleted.')
-        return redirect(self.HTML_REDIRECT)
+        messages.success(
+            request, f'Reservation for room "{room.name}" is done.')
+        return redirect('AllRooms')

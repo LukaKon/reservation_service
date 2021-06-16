@@ -1,0 +1,26 @@
+{% extends "booking/base.html" %}
+{% block title %}Book a room{% endblock %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+    <label for="name">Room "{{ room.name }}":</label>
+    </p>
+
+    <p>
+    <label for="date">Choose date:</label>
+    <input type="date" id="date" name="date" value="">
+    {% if date_error %}
+    {{ name_error }}
+    {% endif %}
+    </p>
+
+    <p>
+    <label for="comment">Comment:</label>
+    <input type="text" id="comment" name="comment" placeholder="Write your notes...">
+    </p>
+
+    <input type="submit" value="Reserve">
+</form>
+{% endblock %}

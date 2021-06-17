@@ -102,7 +102,9 @@ class EditRoom(View):
     HTML_TEMPLATE = 'booking/room/new_room.html'
 
     def get(self, request, room_id):
+        room_id = int(room_id)
         room = Room.objects.get(pk=room_id)
+        print(room)
         return render(request,
                       self.HTML_TEMPLATE,
                       # 'booking/room/new_room.html',
@@ -129,13 +131,13 @@ class EditRoom(View):
                           self.HTML_TEMPLATE,
                           context={'name_error': 'Name alredy exist.', 'room': current_room})
 
-        if capacity.isdigit():
-            capacity = int(capacity)
-        else:
+        if not int(capacity):
             return render(
                 request,
                 self.HTML_TEMPLATE,
                 context={'capacity_error': 'Inserted value is not integer', 'room': current_room})
+        else:
+            capacity = int(capacity)
 
         if capacity not in range(2, 400):
             return render(request,
@@ -149,10 +151,7 @@ class EditRoom(View):
         room.save()
 
         messages.success(request, 'Room data have been updated')
-        return redirect('AllRooms')
-        # return render(request,
-        #               self.HTML_TEMPLATE,
-        #               context={'room': room})
+        return redirect('booking:all_rooms')
 
 
 class DeleteRoom(View):
@@ -163,15 +162,7 @@ class DeleteRoom(View):
         room.delete()
 
         messages.success(request, f'Room {room.name} has been deleted.')
-        return redirect('AllRooms')
-
-    def post(self, request, room_id):
-        room = Room.objects.get(pk=room_id)
-        print(f'DeleteRoom {room}')
-        room.delete()
-
-        messages.success(request, f'Room {room.name} has been deleted.')
-        return redirect('AllRooms')
+        return redirect('booking:all_rooms')
 
 
 class ReserveRoom(View):

@@ -24,17 +24,25 @@
                 {% endif %}
             </td>
             <td>
-                <a href="http://127.0.0.1:8080/room/edit-room/{{ room.id }}">
-                    <button class="button">edit</button>
-                </a>
+                <form action="/room/edit-room/{{ room.id }}">
+                    <!-- <button class="button" type="submit" method="get" formaction="http://127.0.0.1:8000/room/edit-room/{{ room.id }}">edit</button> -->
+                    <a href="http://127.0.0.1:8000/room/edit-room/{{ room.id }}">
+                        <input class="button"type="submit" value="edit">
+                    </a>
+                </form>
             </td>
             <td>
-                <a href="http://127.0.0.1:8080/room/delete-room/{{ room.id }}">
-                    <button class="button">delete</button>
-                </a>
+                <form action="/room/delete-room/{{ room.id }}">
+                    <!-- <a href="http://127.0.0.1:8000/room/delete-room/{{ room.id }}"> -->
+                    <input class="button"type="submit" value="delete">
+                    <!-- </a> -->
+                </form>
+                <!-- <a href="http://127.0.0.1:8000/room/delete-room/{{ room.id }}"> -->
+                <!-- <button class="button">delete</button> -->
+                <!-- </a> -->
             </td>
             <td>
-                <a href="http://127.0.0.1:8080/room/reserve-room/{{ room.id }}">
+                <a href="http://127.0.0.1:8000/room/reserve-room/{{ room.id }}">
                     <button class="button">reserve</button>
                 </a>
             </td>

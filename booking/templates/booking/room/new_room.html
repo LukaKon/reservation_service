@@ -22,7 +22,9 @@
 
     <p>
     <label for="projector_availability">Projector availability:</label>
-    <input type="checkbox" name="projector_availability" value= checked>
+    <input type="checkbox" name="projector_availability" value= checked
+                           {% if room.projector_availability %} checked
+                           {% endif %}>
     <!-- TODO - how to set checbox according to database data -->
     </p>
     <input type="submit" value="Save">

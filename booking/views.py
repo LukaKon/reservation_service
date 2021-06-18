@@ -46,13 +46,13 @@ class NewRoom(View):
                           self.HTML_TEMPLATE,
                           context={'name_error': 'Name alredy exist.'})
 
-        if capacity.isdigit():
-            capacity = int(capacity)
-        else:
+        if not int(capacity):
             return render(
                 request,
                 self.HTML_TEMPLATE,
                 context={'capacity_error': 'Inserted value is not integer'})
+        else:
+            capacity = int(capacity)
 
         if capacity not in range(2, 400):
             return render(request,
@@ -63,7 +63,8 @@ class NewRoom(View):
                             capacity=capacity,
                             projector_availability=projector_availability)
         messages.success(request, f'Room {name} added to DB.')
-        return render(request, self.HTML_TEMPLATE)
+        # return render(request, self.HTML_TEMPLATE)
+        return redirect('booking:all_rooms')
 
 
 class AllRooms(View):
@@ -71,15 +72,17 @@ class AllRooms(View):
 
     def get(self, request):
         rooms = Room.objects.all().order_by('name')
-        return render(request,
-                      self.HTML_TEMPLATE,
-                      context={'rooms': rooms})
-
-    def post(self, request):
-        rooms = Room.objects.all().order_by('name')
-        return render(request,
-                      self.HTML_TEMPLATE,
-                      context={'rooms': rooms})
+        reservations = Reservation.objects.all()
+        if not rooms:  # TODO: not tested yet
+            return render(request, self.HTML_TEMPLATE, context={'empty': True})
+        return render(
+            request,
+            self.HTML_TEMPLATE,
+            context={
+                'rooms': rooms,
+                'reservations': reservations
+            },
+        )
 
 
 class RoomDetails(View):
@@ -87,15 +90,14 @@ class RoomDetails(View):
 
     def get(self, request, room_id):
         room = Room.objects.get(pk=room_id)
+        reservations = Reservation.objects.filter(
+            room_id=room).order_by('-date')
         return render(request,
                       self.HTML_TEMPLATE,
-                      context={'room': room})
-
-    def post(self, request, room_id):
-        room = Room.objects.get(pk=room_id)
-        return render(request,
-                      self.HTML_TEMPLATE,
-                      context={'room': room})
+                      context={
+                          'room': room,
+                          'reservations': reservations,
+                      })
 
 
 class EditRoom(View):
@@ -105,10 +107,7 @@ class EditRoom(View):
         room_id = int(room_id)
         room = Room.objects.get(pk=room_id)
         print(room)
-        return render(request,
-                      self.HTML_TEMPLATE,
-                      # 'booking/room/new_room.html',
-                      context={'room': room})
+        return render(request, self.HTML_TEMPLATE, context={'room': room})
 
     def post(self, request, room_id):
 
@@ -123,26 +122,38 @@ class EditRoom(View):
         if name == '':
             return render(request,
                           self.HTML_TEMPLATE,
-                          context={'name_error': 'Name is required.', 'room': current_room})
+                          context={
+                              'name_error': 'Name is required.',
+                              'room': current_room
+                          })
 
         room_list.remove(current_room)
         if name in room_list:
             return render(request,
                           self.HTML_TEMPLATE,
-                          context={'name_error': 'Name alredy exist.', 'room': current_room})
+                          context={
+                              'name_error': 'Name alredy exist.',
+                              'room': current_room
+                          })
 
         if not int(capacity):
-            return render(
-                request,
-                self.HTML_TEMPLATE,
-                context={'capacity_error': 'Inserted value is not integer', 'room': current_room})
+            return render(request,
+                          self.HTML_TEMPLATE,
+                          context={
+                              'capacity_error':
+                              'Inserted value is not integer',
+                              'room': current_room
+                          })
         else:
             capacity = int(capacity)
 
         if capacity not in range(2, 400):
             return render(request,
                           self.HTML_TEMPLATE,
-                          context={'capacity_error': f'(2-400): {capacity}', 'room': current_room})
+                          context={
+                              'capacity_error': f'(2-400): {capacity}',
+                              'room': current_room
+                          })
 
         room = Room.objects.get(pk=room_id)
         room.name = name
@@ -155,10 +166,8 @@ class EditRoom(View):
 
 
 class DeleteRoom(View):
-
     def get(self, request, room_id):
         room = Room.objects.get(pk=room_id)
-        print(f'DeleteRoom {room}')
         room.delete()
 
         messages.success(request, f'Room {room.name} has been deleted.')
@@ -170,34 +179,38 @@ class ReserveRoom(View):
 
     def get(self, request, room_id):
         room = Room.objects.get(pk=room_id)
-        return render(request,
-                      self.HTML_TEMPLATE,
-                      context={'room': room})
+        return render(request, self.HTML_TEMPLATE, context={'room': room})
 
     def post(self, request, room_id):
         date = request.POST.get('date')
         comment = request.POST.get('comment')
 
-        # print(date, type(date))
-
+        room = Room.objects.get(pk=room_id)
         conv_date = datetime.datetime.strptime(date, '%Y-%m-%d')
 
-        room = Room.objects.get(pk=room_id)
-
-        if conv_date == room.id:
+        if Reservation.objects.filter(room_id=room_id,
+                                      date=conv_date).exists():
             return render(request,
                           self.HTML_TEMPLATE,
-                          context={'date_error': 'Room already reserved.'})
+                          context={
+                              'date_error': 'Room already reserved.',
+                              'room': room
+                          })
 
         if conv_date < datetime.datetime.now():
             return render(request,
                           self.HTML_TEMPLATE,
-                          context={'date_error': 'Are you time traveler?'})
+                          context={
+                              'date_error': 'Are you time traveler?',
+                              'room': room,
+                          })
 
-        Reservation.objects.create(date=date,
-                                   room_id=Room.objects.get(pk=room_id),
-                                   comment=comment,)
+        Reservation.objects.create(
+            date=date,
+            room_id=room,
+            comment=comment,
+        )
 
-        messages.success(
-            request, f'Reservation for room "{room.name}" is done.')
-        return redirect('AllRooms')
+        messages.success(request,
+                         f'Reservation for room "{room.name}" is done.')
+        return redirect('booking:all_rooms')

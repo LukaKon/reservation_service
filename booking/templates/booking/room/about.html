@@ -1,0 +1,12 @@
+{% extends "booking/base.html" %}
+{% block title %}About me{% endblock %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+    About me.
+    </p>
+
+</form>
+{% endblock %}

@@ -3,6 +3,9 @@
 {% block content %}
 <form method="post">
     {% csrf_token %}
+    {% if empty %}
+    <h2>Database is empty.</h2>
+    {% endif %}
     <table>
         <tr>
             <th>Name</th>
@@ -15,36 +18,37 @@
         </tr>
         {% for room in rooms %}
         <tr>
-            <td><a href="http://127.0.0.1:8000/room/room-details/{{ room.id }}">{{ room.name }}</a></td>
+            <td><a href={% url 'booking:room_details' room.id %}>{{ room.name }}</a></td>
             <td>{{ room.capacity }}</td>
-            <td>yes / not</td>
+            <td>
+                {% for reservation in reservations %}
+                {% if reservation.room_id == room %}
+                {% now "Y-m-d" as today %}
+                {% if today == book.date|date:"Y-m-d" %}No
+                {% else %} Yes
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+            </td>
             <td>
                 {% if room.projector_availability %} YES
                 {% else %} NO
                 {% endif %}
             </td>
             <td>
-                <form action="/room/edit-room/{{ room.id }}">
-                    <!-- <button class="button" type="submit" method="get" formaction="http://127.0.0.1:8000/room/edit-room/{{ room.id }}">edit</button> -->
-                    <a href="http://127.0.0.1:8000/room/edit-room/{{ room.id }}">
-                        <input class="button"type="submit" value="edit">
-                    </a>
+                <form action={% url 'booking:edit_room' room.id %}>
+                    <input class="button"type="submit" value="edit">
                 </form>
             </td>
             <td>
-                <form action="/room/delete-room/{{ room.id }}">
-                    <!-- <a href="http://127.0.0.1:8000/room/delete-room/{{ room.id }}"> -->
-                    <input class="button"type="submit" value="delete">
-                    <!-- </a> -->
+                <form action={% url 'booking:delete_room' room.id %}>
+                    <button class="button">delete</button>
                 </form>
-                <!-- <a href="http://127.0.0.1:8000/room/delete-room/{{ room.id }}"> -->
-                <!-- <button class="button">delete</button> -->
-                <!-- </a> -->
             </td>
             <td>
-                <a href="http://127.0.0.1:8000/room/reserve-room/{{ room.id }}">
-                    <button class="button">reserve</button>
-                </a>
+                <form action={% url 'booking:reserve_room' room.id %}>
+                    <input class="button"type="submit" value="reserve">
+                </form>
             </td>
         </tr>
         {% endfor %}

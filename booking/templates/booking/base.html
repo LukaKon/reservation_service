@@ -20,11 +20,10 @@
         <!-- </div> -->
         <nav>
             <ul>
-                <li><a href="http://127.0.0.1:8000/room/home">Home</a></li>
-                <li><a href="http://127.0.0.1:8000/room/all-rooms">All rooms</a></li>
-                <li><a href="http://127.0.0.1:8000/room/new/">Create a new room</a></li>
-                <li style="float:right"><a class="active"
-                                           href="http://127.0.0.1:8000/room/about">About</a></li>
+                <li><a href={% url 'booking:home' %}>Home</a></li>
+                <li><a href={% url 'booking:all_rooms' %}>All rooms</a></li>
+                <li><a href={% url 'booking:new_room' %}>Create a new room</a></li>
+                <li style="float:right"><a class="active" href={% url 'booking:about' %}>About</a></li>
             </ul>
         </nav>
         <div>

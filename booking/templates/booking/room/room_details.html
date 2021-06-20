@@ -13,7 +13,9 @@
         </tr>
         <tr>
             <th>Availability</th>   <!-- TODO: range of dates / yes or no? -->
-            <td></td>
+            <td>
+                {% if room.id in available %} NO {% else %} YES {% endif %}
+            </td>
         </tr>
         <tr>
             <th>Projector</th>

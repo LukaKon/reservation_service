@@ -1,50 +1,50 @@
 {% extends "booking/base.html" %}
 {% block title %}List of all rooms{% endblock %}
 {% block content %}
-<form method="post">
-    {% csrf_token %}
-    {% if empty %}
-    <h2>Database is empty.</h2>
-    {% endif %}
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Capacity</th>
-            <th>Availability</th>   <!-- TODO: range of dates / yes or no? -->
-            <th>Projector</th>
-            <th>Edit room</th>
-            <th>Delete room</th>
-            <th>Reservation</th>
-        </tr>
-        {% for room in rooms %}
-        <tr>
-            <td><a href={% url 'booking:room_details' room.id %}>{{ room.name }}</a></td>
-            <td>{{ room.capacity }}</td>
-            <td>
-                {% if room.id in available %} NO {% else %} YES {% endif %}
-            </td>
-            <td>
-                {% if room.projector_availability %} YES
-                {% else %} NO
-                {% endif %}
-            </td>
-            <td>
-                <form action={% url 'booking:edit_room' room.id %}>
-                    <input class="button"type="submit" value="edit">
-                </form>
-            </td>
-            <td>
-                <form action={% url 'booking:delete_room' room.id %}>
-                    <button class="button">delete</button>
-                </form>
-            </td>
-            <td>
-                <form action={% url 'booking:reserve_room' room.id %}>
-                    <input class="button"type="submit" value="reserve">
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</form>
+    <form method="post">
+        {% csrf_token %}
+        {% if empty %}
+            <h2>Database is empty.</h2>
+        {% endif %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Capacity</th>
+                <th>Availability</th>   <!-- TODO: range of dates / yes or no? -->
+                <th>Projector</th>
+                <th>Edit room</th>
+                <th>Delete room</th>
+                <th>Reservation</th>
+            </tr>
+            {% for room in rooms %}
+                <tr>
+                    <td><a href={% url 'booking:room_details' room.id %}>{{ room.name }}</a></td>
+                    <td>{{ room.capacity }}</td>
+                    <td>
+                    {% if room.id in available %} NO {% else %} YES {% endif %}
+                    </td>
+                    <td>
+                        {% if room.projector_availability %} YES
+                        {% else %} NO
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action={% url 'booking:edit_room' room.id %}>
+                            <input class="button"type="submit" value="edit">
+                        </form>
+                    </td>
+                    <td>
+                        <form action={% url 'booking:delete_room' room.id %}>
+                            <button class="button">delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action={% url 'booking:reserve_room' room.id %}>
+                            <input class="button"type="submit" value="reserve">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "booking/base.html" %}
 {% block title %}Create a new room{% endblock %}
 {% block content %}
-<form method="post">
+<form method="get">
     {% csrf_token %}
     <div>
         <p><h3>Welcome!</h3></p>
@@ -19,27 +19,17 @@
             <tr>
                 <td>
                     <div style="width:30px;">
-                        <!-- <select name="name"> -->
-                        <!--     {% for room in rooms %} -->
-                        <!--     <option value="{{ room.name }}">{{room.name}}</option> -->
-                        <!--     {% endfor %} -->
-                        <!-- </select> -->
-                        <!-- <label for="name">Name room:</label> -->
-                        <input type="text" id="name" name="name">
+                        <input type="text" name="name" placeholder="Room name">
                     </div>
                 </td>
                 <td>
                     <div style="width:30px;">
-                        <input type="number" name="capacity">
+                        <input type="number" step="1" name="capacity">
                     </div>
                 </td>
                 <td>
                     <div style="width:30px;">
-                        <select name="projector_availability">
-                            <option value="not_important">not important</option>
-                            <option value="True">YES</option>
-                            <option value="False">NO</option>
-                        </select>
+                        <input type="checkbox" name="projector_availability">
                     </div>
                 </td>
             </tr>
@@ -53,7 +43,7 @@
     <tr>
         <th>Name</th>
         <th>Capacity</th>
-        <th>Availability</th>   <!-- TODO: range of dates / yes or no? -->
+        <th>Availability</th>
         <th>Projector</th>
         <th>Edit room</th>
         <th>Delete room</th>

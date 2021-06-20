@@ -10,29 +10,27 @@ from . import models
 
 class Home(View):
     HTML_TEMPLATE = 'booking/room/home.html'
-    ROOMS = Room.objects.all()
 
     def get(self, request):
-        return render(request,
-                      self.HTML_TEMPLATE,
-                      context={'rooms': self.ROOMS})
+        name = request.GET.get('name')
+        capacity = request.GET.get('capacity')
+        projector_availability = request.GET.get(
+            'projector_availability') == 'on'
 
-    def post(self, request):
-        name = request.POST.get('name')
-        capacity = int(request.POST.get('capacity'))
-        projector_availability = request.POST.get('projector_availability')
+        capacity = int(capacity) if capacity else 0
+        rooms = Room.objects.all()
 
-        rooms = Room.objects.filter(name__icontains='name', capacity=capacity)
+        if projector_availability:
+            rooms = rooms.filter(projector_availability=projector_availability)
+        if capacity:
+            rooms = rooms.filter(capacity__gte=capacity)
+        if name:
+            rooms = rooms.filter(name__icontains=name)
 
-        return render(
-            request,
-            self.HTML_TEMPLATE,
-            context={'rooms': rooms},
-        )
+        return render(request, self.HTML_TEMPLATE, context={'rooms': rooms})
 
 
 class About(View):
-    # TODO: about.html is empty
     HTML_TEMPLATE = 'booking/room/about.html'
 
     def get(self, request):
@@ -79,7 +77,6 @@ class NewRoom(View):
                             capacity=capacity,
                             projector_availability=projector_availability)
         messages.success(request, f'Room {name} added to DB.')
-        # return render(request, self.HTML_TEMPLATE)
         return redirect('booking:all_rooms')
 
 

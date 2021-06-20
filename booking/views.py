@@ -80,7 +80,7 @@ class AllRooms(View):
             self.HTML_TEMPLATE,
             context={
                 'rooms': rooms,
-                'reservations': reservations
+                'reservations': reservations,
             },
         )
 

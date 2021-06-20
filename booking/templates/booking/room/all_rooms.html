@@ -21,14 +21,7 @@
             <td><a href={% url 'booking:room_details' room.id %}>{{ room.name }}</a></td>
             <td>{{ room.capacity }}</td>
             <td>
-                {% for reservation in reservations %}
-                {% if reservation.room_id == room %}
-                {% now "Y-m-d" as today %}
-                {% if today == book.date|date:"Y-m-d" %}No
-                {% elif %}
-                {% endif %}
-                {% endif %}
-                {% endfor %}
+                {% if room.id in available %} NO {% else %} YES {% endif %}
             </td>
             <td>
                 {% if room.projector_availability %} YES

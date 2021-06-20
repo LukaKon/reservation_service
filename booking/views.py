@@ -1,18 +1,34 @@
 from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect
 from booking.models import Room, Reservation
 from django.views import View
 from django.contrib import messages
 from django.db.utils import IntegrityError
 import datetime
 from . import models
-# Create your views here.
 
 
 class Home(View):
     HTML_TEMPLATE = 'booking/room/home.html'
+    ROOMS = Room.objects.all()
 
     def get(self, request):
-        return render(request, self.HTML_TEMPLATE)
+        return render(request,
+                      self.HTML_TEMPLATE,
+                      context={'rooms': self.ROOMS})
+
+    def post(self, request):
+        name = request.POST.get('name')
+        capacity = int(request.POST.get('capacity'))
+        projector_availability = request.POST.get('projector_availability')
+
+        rooms = Room.objects.filter(name__icontains='name', capacity=capacity)
+
+        return render(
+            request,
+            self.HTML_TEMPLATE,
+            context={'rooms': rooms},
+        )
 
 
 class About(View):
@@ -73,6 +89,12 @@ class AllRooms(View):
     def get(self, request):
         rooms = Room.objects.all().order_by('name')
         reservations = Reservation.objects.all()
+
+        available = []
+        for reservation in reservations:
+            if reservation.date == datetime.date.today():
+                available.append(reservation.room_id.id)
+
         if not rooms:  # TODO: not tested yet
             return render(request, self.HTML_TEMPLATE, context={'empty': True})
         return render(
@@ -80,7 +102,7 @@ class AllRooms(View):
             self.HTML_TEMPLATE,
             context={
                 'rooms': rooms,
-                'reservations': reservations,
+                'available': available,
             },
         )
 
@@ -179,7 +201,14 @@ class ReserveRoom(View):
 
     def get(self, request, room_id):
         room = Room.objects.get(pk=room_id)
-        return render(request, self.HTML_TEMPLATE, context={'room': room})
+        reservations = Reservation.objects.filter(
+            room_id=room).order_by('-date')
+        return render(request,
+                      self.HTML_TEMPLATE,
+                      context={
+                          'room': room,
+                          'reservations': reservations
+                      })
 
     def post(self, request, room_id):
         date = request.POST.get('date')
@@ -197,7 +226,8 @@ class ReserveRoom(View):
                               'room': room
                           })
 
-        if conv_date < datetime.datetime.now():
+        if conv_date < datetime.datetime.strptime(
+                datetime.datetime.now().strftime('%Y-%m-%d'), '%Y-%m-%d'):
             return render(request,
                           self.HTML_TEMPLATE,
                           context={

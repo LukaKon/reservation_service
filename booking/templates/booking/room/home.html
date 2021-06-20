@@ -1,10 +1,93 @@
 {% extends "booking/base.html" %}
 {% block title %}Create a new room{% endblock %}
 {% block content %}
-<form method="get">
-
+<form method="post">
+    {% csrf_token %}
     <div>
         <p><h3>Welcome!</h3></p>
         <p>This is service for booking rooms.</p>
     </div>
-    {% endblock %}
+
+    <p> <h3>Search for rooms</h3></p>
+    <div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Capacity</th>
+                <th>Projector</th>
+            </tr>
+            <tr>
+                <td>
+                    <div style="width:30px;">
+                        <!-- <select name="name"> -->
+                        <!--     {% for room in rooms %} -->
+                        <!--     <option value="{{ room.name }}">{{room.name}}</option> -->
+                        <!--     {% endfor %} -->
+                        <!-- </select> -->
+                        <!-- <label for="name">Name room:</label> -->
+                        <input type="text" id="name" name="name">
+                    </div>
+                </td>
+                <td>
+                    <div style="width:30px;">
+                        <input type="number" name="capacity">
+                    </div>
+                </td>
+                <td>
+                    <div style="width:30px;">
+                        <select name="projector_availability">
+                            <option value="not_important">not important</option>
+                            <option value="True">YES</option>
+                            <option value="False">NO</option>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <input type="submit" value="Search">
+</form>
+{% if rooms %}
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Capacity</th>
+        <th>Availability</th>   <!-- TODO: range of dates / yes or no? -->
+        <th>Projector</th>
+        <th>Edit room</th>
+        <th>Delete room</th>
+        <th>Reservation</th>
+    </tr>
+    {% for room in rooms %}
+    <tr>
+        <td><a href={% url 'booking:room_details' room.id %}>{{ room.name }}</a></td>
+        <td>{{ room.capacity }}</td>
+        <td>
+            {% if room.id in available %} NO {% else %} YES {% endif %}
+        </td>
+        <td>
+            {% if room.projector_availability %} YES
+            {% else %} NO
+            {% endif %}
+        </td>
+        <td>
+            <form action={% url 'booking:edit_room' room.id %}>
+                <input class="button"type="submit" value="edit">
+            </form>
+        </td>
+        <td>
+            <form action={% url 'booking:delete_room' room.id %}>
+                <button class="button">delete</button>
+            </form>
+        </td>
+        <td>
+            <form action={% url 'booking:reserve_room' room.id %}>
+                <input class="button"type="submit" value="reserve">
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% endblock %}
